@@ -1,0 +1,12 @@
+# NetBeans Ant build & distribution directories
+build/
+dist/
+*.class
+
+# NetBeans user-specific private configuration (JANGAN di-commit agar path JDK tidak bentrok antar laptop)
+nbproject/private/
+
+# OS & Editor temporary files
+.DS_Store
+Thumbs.db
+*.log

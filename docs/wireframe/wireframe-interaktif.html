@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wireframe Java Desktop App - IndoFX Admin</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased p-4 md:p-6">
+
+  <!-- Header & Mode Switcher -->
+  <div class="max-w-6xl mx-auto mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 shadow-sm">
+    <div>
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-orange-500/15 text-orange-500 border border-orange-500/30">
+          Java Swing Wireframe
+        </span>
+        <h1 class="text-base md:text-lg font-bold text-[var(--foreground)]">
+          IndoFX Admin — Simulasi Wireframe Java Desktop
+        </h1>
+      </div>
+      <p class="text-xs text-[var(--muted-foreground)] mt-1">
+        Klik menu di sidebar atau tombol aksi pada tabel untuk mencoba semua <strong>Pop-up (JDialog)</strong> yang sudah disederhanakan.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button id="btnViewLogin" onclick="switchFrame('login')" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] hover:border-orange-500 transition">
+        1. JFrame: Login
+      </button>
+      <button id="btnViewMain" onclick="switchFrame('main')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-500 text-white shadow-sm transition">
+        2. JFrame: Main Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- Simulated Desktop OS Window Frame -->
+  <div class="max-w-6xl mx-auto border-2 border-[var(--border)] rounded-xl overflow-hidden shadow-lg bg-[var(--card)]">
+
+    <!-- OS Window Title Bar -->
+    <div class="bg-[var(--sidebar)] border-b border-[var(--border)] px-4 py-2 flex items-center justify-between select-none">
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+        <span id="windowTitle" class="ml-2 text-xs font-mono text-[var(--muted-foreground)]">
+          IndoFX Admin Desktop v1.0 — MainAdminFrame.java (CardLayout)
+        </span>
+      </div>
+      <span class="text-xs font-mono text-[var(--muted-foreground)]">Java SE / Swing UI</span>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FRAME 1: LOGIN WINDOW (LoginFrame.java)    -->
+    <!-- ========================================== -->
+    <div id="frameLogin" class="hidden py-14 px-4 bg-[var(--background)] flex items-center justify-center">
+      <div class="w-full max-w-md bg-[var(--card)] border-2 border-dashed border-[var(--border)] rounded-xl p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-mono px-2 py-0.5 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20">
+            JPanel: LoginPanel
+          </span>
+          <span class="text-xs font-mono text-[var(--muted-foreground)]">420 x 380 px</span>
+        </div>
+
+        <h2 class="text-xl font-bold text-[var(--foreground)] mt-2">Masuk ke Akun Admin</h2>
+        <p class="text-xs text-[var(--muted-foreground)] mt-1">
+          Gunakan akun Admin IndoFX untuk mengelola aset & transaksi
+        </p>
+
+        <div class="mt-5 space-y-4">
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-[var(--foreground)]">
+              Alamat Email / Username <span class="font-mono text-[var(--muted-foreground)]">(JTextField)</span>
+            </label>
+            <input id="loginEmail" type="text" value="admin@indofx.com" class="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)]" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold mb-1 text-[var(--foreground)]">
+              Kata Sandi <span class="font-mono text-[var(--muted-foreground)]">(JPasswordField)</span>
+            </label>
+            <input id="loginPass" type="password" value="admin123" class="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)]" />
+          </div>
+
+          <div id="loginErrorBox" class="hidden p-2.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500 text-xs">
+            [!] JLabel Error: Email atau kata sandi salah.
+          </div>
+
+          <div class="pt-2 flex flex-col gap-2">
+            <button onclick="switchFrame('main')" class="w-full py-2.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm transition">
+              Masuk ke Dashboard (JButton)
+            </button>
+            <button onclick="document.getElementById('loginErrorBox').classList.toggle('hidden')" class="w-full py-1.5 rounded-lg border border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)]">
+              Simulasi Pesan Error Login
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FRAME 2: MAIN ADMIN WINDOW                 -->
+    <!-- ========================================== -->
+    <div id="frameMain" class="flex flex-col">
+
+      <!-- Top Header Bar (JPanel North) -->
+      <div class="bg-orange-500 text-white px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="font-extrabold text-base tracking-wide bg-white/15 px-2.5 py-1 rounded">
+            IndoFX
+          </div>
+          <span class="text-xs bg-black/20 px-2 py-0.5 rounded font-mono">
+            BorderLayout.NORTH (HeaderPanel)
+          </span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium">Admin: Andi Pratama</span>
+          <button onclick="openModal('modalLogout')" class="px-3 py-1 rounded bg-white text-orange-600 font-semibold text-xs hover:bg-orange-50 transition">
+            Logout (JButton)
+          </button>
+        </div>
+      </div>
+
+      <!-- Body Content: Sidebar (WEST) + CardLayout Content (CENTER) -->
+      <div class="flex flex-col md:flex-row min-h-[540px]">
+
+        <!-- Left Sidebar Navigation (BorderLayout.WEST) -->
+        <div class="w-full md:w-64 bg-[var(--sidebar)] border-b md:border-b-0 md:border-r border-[var(--border)] p-3 flex flex-col justify-between">
+          <div>
+            <div class="px-2 py-1 mb-2 text-xs font-mono text-[var(--muted-foreground)] border-b border-[var(--border)]">
+              SidebarPanel (8 Menu)
+            </div>
+            <nav class="space-y-1" id="sidebarNav">
+              <button onclick="showTab('dashboard')" data-tab="dashboard" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-between bg-orange-500 text-white">
+                <span>1. Ringkasan Dashboard</span>
+              </button>
+              <button onclick="showTab('moderasi')" data-tab="moderasi" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between text-[var(--foreground)] hover:bg-[var(--background)]">
+                <span>2. Moderasi Aset</span>
+                <span class="px-1.5 py-0.5 text-xs rounded bg-orange-500/20 text-orange-500 font-bold">3</span>
+              </button>
+              <button onclick="showTab('kategori')" data-tab="kategori" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between text-[var(--foreground)] hover:bg-[var(--background)]">
+                <span>3. Kategori Aset</span>
+              </button>
+              <button onclick="showTab('pengguna')" data-tab="pengguna" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between text-[var(--foreground)] hover:bg-[var(--background)]">
+                <span>4. Manajemen Pengguna</span>
+              </button>
+              <button onclick="showTab('laporan')" data-tab="laporan" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between text-[var(--foreground)] hover:bg-[var(--background)]">
+                <span>5. Persetujuan & Laporan</span>
+                <span class="px-1.5 py-0.5 text-xs rounded bg-orange-500/20 text-orange-500 font-bold">2</span>
+              </button>
+              <button onclick="showTab('transaksi')" data-tab="transaksi" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between text-[var(--foreground)] hover:bg-[var(--background)]">
+                <span>6. Monitoring Transaksi</span>
+              </button>
+              <button onclick="showTab('pencairan')" data-tab="pencairan" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between text-[var(--foreground)] hover:bg-[var(--background)]">
+                <span>7. Verifikasi Pencairan</span>
+                <span class="px-1.5 py-0.5 text-xs rounded bg-orange-500/20 text-orange-500 font-bold">2</span>
+              </button>
+              <button onclick="showTab('pengaturan')" data-tab="pengaturan" class="nav-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between text-[var(--foreground)] hover:bg-[var(--background)]">
+                <span>8. Pengaturan Komisi</span>
+              </button>
+            </nav>
+          </div>
+
+          <div class="mt-4 p-2.5 rounded-lg border border-dashed border-[var(--border)] bg-[var(--background)] text-xs text-[var(--muted-foreground)]">
+            <div class="font-semibold text-[var(--foreground)] mb-1">Arsitektur Swing:</div>
+            Semua menu di atas berada di dalam 1 <code>JFrame</code> menggunakan <code>CardLayout</code>.
+          </div>
+        </div>
+
+        <!-- Center Content Area (BorderLayout.CENTER - CardLayout) -->
+        <div class="flex-1 p-5 bg-[var(--background)]">
+
+          <!-- TAB 1: DASHBOARD -->
+          <div id="tab-dashboard" class="tab-pane space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--border)] pb-3">
+              <div>
+                <span class="text-xs font-mono text-orange-500">Card 1: DashboardPanel.java</span>
+                <h2 class="text-lg font-bold">Ringkasan Aktivitas Sistem</h2>
+              </div>
+              <span class="text-xs text-[var(--muted-foreground)]">Statistik utama & antrean moderasi aset terbaru</span>
+            </div>
+
+            <!-- 4 Stat Cards (GridLayout 1x4) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div class="p-3.5 rounded-xl bg-[var(--card)] border border-[var(--border)]">
+                <div class="text-xs text-[var(--muted-foreground)]">Total Aset Aktif</div>
+                <div class="text-xl font-bold mt-1">1,240</div>
+                <div class="text-xs text-emerald-500 mt-1">+12 minggu ini</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-[var(--card)] border border-[var(--border)]">
+                <div class="text-xs text-[var(--muted-foreground)]">Menunggu Moderasi</div>
+                <div class="text-xl font-bold text-orange-500 mt-1">18 Aset</div>
+                <div class="text-xs text-[var(--muted-foreground)] mt-1">Perlu ditinjau</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-[var(--card)] border border-[var(--border)]">
+                <div class="text-xs text-[var(--muted-foreground)]">Total Pengguna</div>
+                <div class="text-xl font-bold mt-1">3,450</div>
+                <div class="text-xs text-emerald-500 mt-1">420 Kreator</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-[var(--card)] border border-[var(--border)]">
+                <div class="text-xs text-[var(--muted-foreground)]">Komisi Platform (Bulan Ini)</div>
+                <div class="text-xl font-bold mt-1">Rp 14.5M</div>
+                <div class="text-xs text-[var(--muted-foreground)] mt-1">Potongan 10%</div>
+              </div>
+            </div>
+
+            <!-- Table Queue -->
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <h3 class="text-sm font-bold">Antrean Moderasi Aset Terbaru <span class="font-mono text-xs font-normal text-[var(--muted-foreground)]">(JTable)</span></h3>
+                  <p class="text-xs text-[var(--muted-foreground)]">Klik "Tinjau (Pop-up)" untuk langsung menyetujui/menolak via JDialog tanpa pindah halaman</p>
+                </div>
+                <button onclick="showTab('moderasi')" class="text-xs text-orange-500 font-semibold hover:underline">
+                  Lihat Semua &rarr;
+                </button>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)] bg-[var(--background)]">
+                      <th class="p-2.5">Nama Aset</th>
+                      <th class="p-2.5">Kreator</th>
+                      <th class="p-2.5">Kategori</th>
+                      <th class="p-2.5">Harga</th>
+                      <th class="p-2.5">Status</th>
+                      <th class="p-2.5 text-right">Aksi (Pop-up)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[var(--border)]">
+                    <tr>
+                      <td class="p-2.5 font-semibold">Cyberpunk City 3D Pack</td>
+                      <td class="p-2.5">StudioNusa</td>
+                      <td class="p-2.5">3D Environment</td>
+                      <td class="p-2.5">Rp 250.000</td>
+                      <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-500 font-semibold">Pending</span></td>
+                      <td class="p-2.5 text-right space-x-1">
+                        <button onclick="openAssetModal('Cyberpunk City 3D Pack', 'StudioNusa', '3D Environment', 'Rp 250.000', 'Blender (.blend), FBX, 4K Textures (1.2 GB)', 'Pending')" class="px-2.5 py-1 rounded bg-orange-500 text-white font-semibold hover:bg-orange-600">
+                          Tinjau (Pop-up)
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="p-2.5 font-semibold">Cinematic Fire VFX Vol.2</td>
+                      <td class="p-2.5">RakaVFX</td>
+                      <td class="p-2.5">Footage / VFX</td>
+                      <td class="p-2.5">Rp 120.000</td>
+                      <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-500 font-semibold">Pending</span></td>
+                      <td class="p-2.5 text-right space-x-1">
+                        <button onclick="openAssetModal('Cinematic Fire VFX Vol.2', 'RakaVFX', 'Footage / VFX', 'Rp 120.000', 'MOV ProRes 4444 Alpha Channel (850 MB)', 'Pending')" class="px-2.5 py-1 rounded bg-orange-500 text-white font-semibold hover:bg-orange-600">
+                          Tinjau (Pop-up)
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="p-2.5 font-semibold">Indonesian Temple Ruins</td>
+                      <td class="p-2.5">GarudaMesh</td>
+                      <td class="p-2.5">3D Asset</td>
+                      <td class="p-2.5">Rp 300.000</td>
+                      <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-semibold">Disetujui</span></td>
+                      <td class="p-2.5 text-right">
+                        <button onclick="openAssetModal('Indonesian Temple Ruins', 'GarudaMesh', '3D Asset', 'Rp 300.000', 'OBJ, FBX, Unreal Engine 5 Asset Pack', 'Disetujui')" class="px-2.5 py-1 rounded border border-[var(--border)] hover:bg-[var(--background)]">
+                          Detail (Pop-up)
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: MODERASI ASET -->
+          <div id="tab-moderasi" class="tab-pane hidden space-y-4">
+            <div class="border-b border-[var(--border)] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-mono text-orange-500">Card 2: ModerasiAsetPanel.java</span>
+                <h2 class="text-lg font-bold">Moderasi & Persetujuan Aset</h2>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-medium">
+                Penyederhanaan: Detail & Approve dijadikan 1 Pop-up JDialog
+              </span>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="flex flex-wrap gap-2 bg-[var(--card)] p-3 rounded-xl border border-[var(--border)]">
+              <input type="text" placeholder="Cari nama aset atau kreator... (JTextField)" class="flex-1 min-w-[200px] px-3 py-1.5 text-xs rounded-lg border border-[var(--border)] bg-[var(--background)]" />
+              <select class="px-3 py-1.5 text-xs rounded-lg border border-[var(--border)] bg-[var(--background)]">
+                <option>Semua Kategori (JComboBox)</option>
+                <option>3D Environment</option>
+                <option>Footage / VFX</option>
+                <option>Audio & SFX</option>
+              </select>
+              <select class="px-3 py-1.5 text-xs rounded-lg border border-[var(--border)] bg-[var(--background)]">
+                <option>Status: Semua</option>
+                <option>Pending</option>
+                <option>Disetujui</option>
+                <option>Ditolak</option>
+              </select>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)] bg-[var(--background)]">
+                    <th class="p-2.5">ID</th>
+                    <th class="p-2.5">Nama Aset</th>
+                    <th class="p-2.5">Kreator</th>
+                    <th class="p-2.5">Kategori</th>
+                    <th class="p-2.5">Harga</th>
+                    <th class="p-2.5">Status</th>
+                    <th class="p-2.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--border)]">
+                  <tr>
+                    <td class="p-2.5 font-mono">AST-101</td>
+                    <td class="p-2.5 font-semibold">Cyberpunk City 3D Pack</td>
+                    <td class="p-2.5">StudioNusa</td>
+                    <td class="p-2.5">3D Environment</td>
+                    <td class="p-2.5">Rp 250.000</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-500 font-semibold">Pending</span></td>
+                    <td class="p-2.5 text-right">
+                      <button onclick="openAssetModal('Cyberpunk City 3D Pack', 'StudioNusa', '3D Environment', 'Rp 250.000', 'Blender (.blend), FBX, 4K Textures (1.2 GB)', 'Pending')" class="px-3 py-1 rounded bg-orange-500 text-white font-semibold hover:bg-orange-600">
+                        Tinjau & Approve (Pop-up)
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 font-mono">AST-102</td>
+                    <td class="p-2.5 font-semibold">Sci-Fi Laser Sound Pack</td>
+                    <td class="p-2.5">AudioWave</td>
+                    <td class="p-2.5">Audio & SFX</td>
+                    <td class="p-2.5">Rp 75.000</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-500 font-semibold">Pending</span></td>
+                    <td class="p-2.5 text-right">
+                      <button onclick="openAssetModal('Sci-Fi Laser Sound Pack', 'AudioWave', 'Audio & SFX', 'Rp 75.000', 'WAV 24-bit 96kHz (120 Sound Effects)', 'Pending')" class="px-3 py-1 rounded bg-orange-500 text-white font-semibold hover:bg-orange-600">
+                        Tinjau & Approve (Pop-up)
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 font-mono">AST-099</td>
+                    <td class="p-2.5 font-semibold">Explosion Dust Pack</td>
+                    <td class="p-2.5">VFXMaster</td>
+                    <td class="p-2.5">Footage / VFX</td>
+                    <td class="p-2.5">Rp 150.000</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-red-500/15 text-red-500 font-semibold">Ditolak</span></td>
+                    <td class="p-2.5 text-right">
+                      <button onclick="openAssetModal('Explosion Dust Pack', 'VFXMaster', 'Footage / VFX', 'Rp 150.000', 'MP4 1080p (Resolusi kurang dari standar 4K)', 'Ditolak')" class="px-3 py-1 rounded border border-[var(--border)] hover:bg-[var(--background)]">
+                        Lihat Detail
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 3: KATEGORI ASET -->
+          <div id="tab-kategori" class="tab-pane hidden space-y-4">
+            <div class="border-b border-[var(--border)] pb-3 flex items-center justify-between">
+              <div>
+                <span class="text-xs font-mono text-orange-500">Card 3: KategoriPanel.java</span>
+                <h2 class="text-lg font-bold">Manajemen Kategori Aset</h2>
+              </div>
+              <button onclick="openModal('modalKategori')" class="px-3 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600">
+                + Tambah Kategori (Pop-up)
+              </button>
+            </div>
+
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)] bg-[var(--background)]">
+                    <th class="p-2.5">No</th>
+                    <th class="p-2.5">Nama Kategori</th>
+                    <th class="p-2.5">Kode / Slug</th>
+                    <th class="p-2.5">Jumlah Aset</th>
+                    <th class="p-2.5">Status</th>
+                    <th class="p-2.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--border)]">
+                  <tr>
+                    <td class="p-2.5">1</td>
+                    <td class="p-2.5 font-semibold">3D Environment & Models</td>
+                    <td class="p-2.5 font-mono">3d-models</td>
+                    <td class="p-2.5">540 Aset</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-semibold">Aktif</span></td>
+                    <td class="p-2.5 text-right space-x-1">
+                      <button onclick="openModal('modalKategori')" class="px-2.5 py-1 rounded border border-[var(--border)] hover:bg-[var(--background)]">Edit</button>
+                      <button onclick="openModal('modalHapus')" class="px-2.5 py-1 rounded bg-red-500/15 text-red-500 font-semibold hover:bg-red-500/25">Hapus</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5">2</td>
+                    <td class="p-2.5 font-semibold">Footage & Visual Effects (VFX)</td>
+                    <td class="p-2.5 font-mono">vfx-footage</td>
+                    <td class="p-2.5">410 Aset</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-semibold">Aktif</span></td>
+                    <td class="p-2.5 text-right space-x-1">
+                      <button onclick="openModal('modalKategori')" class="px-2.5 py-1 rounded border border-[var(--border)] hover:bg-[var(--background)]">Edit</button>
+                      <button onclick="openModal('modalHapus')" class="px-2.5 py-1 rounded bg-red-500/15 text-red-500 font-semibold hover:bg-red-500/25">Hapus</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 4: MANAJEMEN PENGGUNA -->
+          <div id="tab-pengguna" class="tab-pane hidden space-y-4">
+            <div class="border-b border-[var(--border)] pb-3">
+              <span class="text-xs font-mono text-orange-500">Card 4: PenggunaPanel.java</span>
+              <h2 class="text-lg font-bold">Manajemen Pengguna & Kreator</h2>
+            </div>
+
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)] bg-[var(--background)]">
+                    <th class="p-2.5">Nama Pengguna</th>
+                    <th class="p-2.5">Email</th>
+                    <th class="p-2.5">Role</th>
+                    <th class="p-2.5">Status Akun</th>
+                    <th class="p-2.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--border)]">
+                  <tr>
+                    <td class="p-2.5 font-semibold">Dimas Prasetyo</td>
+                    <td class="p-2.5">dimas@studionusa.id</td>
+                    <td class="p-2.5">Kreator</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-semibold">Aktif</span></td>
+                    <td class="p-2.5 text-right">
+                      <button onclick="openModal('modalUser')" class="px-2.5 py-1 rounded bg-orange-500 text-white font-semibold">
+                        Ubah Status / Role (Pop-up)
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 font-semibold">Budi Santoso</td>
+                    <td class="p-2.5">budi.s@gmail.com</td>
+                    <td class="p-2.5">Pembeli (Buyer)</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-red-500/15 text-red-500 font-semibold">Suspended</span></td>
+                    <td class="p-2.5 text-right">
+                      <button onclick="openModal('modalUser')" class="px-2.5 py-1 rounded bg-orange-500 text-white font-semibold">
+                        Ubah Status / Role (Pop-up)
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 5: LAPORAN & PENGAJUAN -->
+          <div id="tab-laporan" class="tab-pane hidden space-y-4">
+            <div class="border-b border-[var(--border)] pb-3">
+              <span class="text-xs font-mono text-orange-500">Card 5: LaporanPanel.java</span>
+              <h2 class="text-lg font-bold">Persetujuan Pengajuan & Laporan Masalah</h2>
+            </div>
+
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)] bg-[var(--background)]">
+                    <th class="p-2.5">ID Tiket</th>
+                    <th class="p-2.5">Pelapor / Pengaju</th>
+                    <th class="p-2.5">Subjek</th>
+                    <th class="p-2.5">Status</th>
+                    <th class="p-2.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--border)]">
+                  <tr>
+                    <td class="p-2.5 font-mono">RPT-201</td>
+                    <td class="p-2.5 font-semibold">Andika (Buyer)</td>
+                    <td class="p-2.5">File aset corrupt saat didownload</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-500 font-semibold">Menunggu</span></td>
+                    <td class="p-2.5 text-right">
+                      <button onclick="openModal('modalLaporan')" class="px-2.5 py-1 rounded bg-orange-500 text-white font-semibold">
+                        Tinjau Laporan (Pop-up)
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 6: MONITORING TRANSAKSI -->
+          <div id="tab-transaksi" class="tab-pane hidden space-y-4">
+            <div class="border-b border-[var(--border)] pb-3">
+              <span class="text-xs font-mono text-orange-500">Card 6: TransaksiPanel.java</span>
+              <h2 class="text-lg font-bold">Monitoring Transaksi & Komisi</h2>
+            </div>
+
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)] bg-[var(--background)]">
+                    <th class="p-2.5">ID Transaksi</th>
+                    <th class="p-2.5">Aset</th>
+                    <th class="p-2.5">Pembeli</th>
+                    <th class="p-2.5">Total Bayar</th>
+                    <th class="p-2.5">Komisi (10%)</th>
+                    <th class="p-2.5">Status</th>
+                    <th class="p-2.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--border)]">
+                  <tr>
+                    <td class="p-2.5 font-mono">TRX-9081</td>
+                    <td class="p-2.5 font-semibold">Indonesian Temple Ruins</td>
+                    <td class="p-2.5">Kevin Pratama</td>
+                    <td class="p-2.5">Rp 300.000</td>
+                    <td class="p-2.5 text-emerald-500 font-semibold">Rp 30.000</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-semibold">Lunas</span></td>
+                    <td class="p-2.5 text-right">
+                      <button onclick="openModal('modalTransaksi')" class="px-2.5 py-1 rounded border border-[var(--border)] hover:bg-[var(--background)]">
+                        Detail Ringkas (Pop-up)
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 7: VERIFIKASI PENCAIRAN (PAYOUT) -->
+          <div id="tab-pencairan" class="tab-pane hidden space-y-4">
+            <div class="border-b border-[var(--border)] pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-mono text-orange-500">Card 7: PencairanPanel.java</span>
+                <h2 class="text-lg font-bold">Verifikasi Pencairan Dana Kreator</h2>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-medium">
+                Penyederhanaan: Tanpa Upload Gambar Bukti Invoice
+              </span>
+            </div>
+
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)] bg-[var(--background)]">
+                    <th class="p-2.5">ID Payout</th>
+                    <th class="p-2.5">Kreator</th>
+                    <th class="p-2.5">Rekening Tujuan</th>
+                    <th class="p-2.5">Nominal</th>
+                    <th class="p-2.5">Status</th>
+                    <th class="p-2.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[var(--border)]">
+                  <tr>
+                    <td class="p-2.5 font-mono">WD-501</td>
+                    <td class="p-2.5 font-semibold">StudioNusa</td>
+                    <td class="p-2.5">BCA - 8820192831</td>
+                    <td class="p-2.5 font-bold">Rp 1.500.000</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-500 font-semibold">Pending</span></td>
+                    <td class="p-2.5 text-right">
+                      <button onclick="openModal('modalPencairan')" class="px-3 py-1 rounded bg-orange-500 text-white font-semibold hover:bg-orange-600">
+                        Verifikasi Sederhana (Pop-up)
+                      </button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="p-2.5 font-mono">WD-500</td>
+                    <td class="p-2.5 font-semibold">GarudaMesh</td>
+                    <td class="p-2.5">Mandiri - 1300098271</td>
+                    <td class="p-2.5 font-bold">Rp 850.000</td>
+                    <td class="p-2.5"><span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-semibold">Selesai</span></td>
+                    <td class="p-2.5 text-right">
+                      <button onclick="openModal('modalPencairan')" class="px-3 py-1 rounded border border-[var(--border)]">
+                        Lihat Detail
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 8: PENGATURAN KOMISI -->
+          <div id="tab-pengaturan" class="tab-pane hidden space-y-4">
+            <div class="border-b border-[var(--border)] pb-3">
+              <span class="text-xs font-mono text-orange-500">Card 8: PengaturanPanel.java</span>
+              <h2 class="text-lg font-bold">Pengaturan Sistem & Komisi Platform</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-[var(--card)] border border-[var(--border)] rounded-xl p-4 space-y-3">
+                <div>
+                  <label class="block text-xs font-semibold mb-1">Komisi Platform (%) <span class="font-mono text-[var(--muted-foreground)]">(JTextField)</span></label>
+                  <input type="number" value="10" class="w-full px-3 py-2 text-xs rounded-lg border border-[var(--border)] bg-[var(--background)]" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold mb-1">Batas Minimum Pencairan (Rp)</label>
+                  <input type="text" value="100000" class="w-full px-3 py-2 text-xs rounded-lg border border-[var(--border)] bg-[var(--background)]" />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold mb-1">Catatan Kebijakan (JTextArea)</label>
+                  <textarea rows="3" class="w-full px-3 py-2 text-xs rounded-lg border border-[var(--border)] bg-[var(--background)]">Pencairan diproses maksimal 1x24 jam kerja.</textarea>
+                </div>
+                <button onclick="alert('JOptionPane.showMessageDialog: Pengaturan berhasil disimpan!')" class="px-4 py-2 rounded-lg bg-orange-500 text-white text-xs font-semibold">
+                  Simpan Perubahan (JButton)
+                </button>
+              </div>
+
+              <div class="bg-[var(--card)] border border-dashed border-[var(--border)] rounded-xl p-4 text-xs space-y-2">
+                <div class="font-bold text-sm">Ringkasan Aturan Aktif</div>
+                <p class="text-[var(--muted-foreground)]">• Setiap penjualan aset dipotong komisi platform sebesar <strong>10%</strong>.</p>
+                <p class="text-[var(--muted-foreground)]">• Kreator menerima <strong>90%</strong> bersih ke saldo akun.</p>
+                <p class="text-[var(--muted-foreground)]">• Penarikan saldo minimal <strong>Rp 100.000</strong>.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SIMPLIFIED POP-UP DIALOGS (JDialog / JOptionPane)        -->
+  <!-- ======================================================== -->
+
+  <!-- 1. POP-UP MODERASI & DETAIL ASET (Sederhana, Tanpa Pindah Halaman) -->
+  <div id="modalAsset" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+    <div class="w-full max-w-md bg-[var(--card)] border-2 border-[var(--border)] rounded-xl shadow-2xl overflow-hidden">
+      <div class="bg-[var(--sidebar)] px-4 py-2.5 border-b border-[var(--border)] flex items-center justify-between">
+        <span class="text-xs font-mono font-semibold">JDialog: Detail & Persetujuan Aset</span>
+        <button onclick="closeModal('modalAsset')" class="text-xs px-2 py-0.5 rounded hover:bg-red-500/20 text-red-500 font-bold">X</button>
+      </div>
+      <div class="p-5 space-y-3 text-xs">
+        <div class="p-2.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-500">
+          <strong>Versi Sederhana Java App:</strong> Tidak perlu pindah halaman atau galeri gambar berat. Cukup informasi teks & tombol Approve/Reject.
+        </div>
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-[var(--border)]">
+          <span class="text-[var(--muted-foreground)]">Nama Aset:</span>
+          <span id="mAssetName" class="col-span-2 font-bold">Cyberpunk City 3D Pack</span>
+          <span class="text-[var(--muted-foreground)]">Kreator:</span>
+          <span id="mAssetCreator" class="col-span-2">StudioNusa</span>
+          <span class="text-[var(--muted-foreground)]">Kategori:</span>
+          <span id="mAssetCat" class="col-span-2">3D Environment</span>
+          <span class="text-[var(--muted-foreground)]">Harga:</span>
+          <span id="mAssetPrice" class="col-span-2 font-semibold">Rp 250.000</span>
+          <span class="text-[var(--muted-foreground)]">Spesifikasi File:</span>
+          <span id="mAssetSpec" class="col-span-2">Blender (.blend), FBX, 4K Textures</span>
+          <span class="text-[var(--muted-foreground)]">Status Saat Ini:</span>
+          <span id="mAssetStatus" class="col-span-2 font-bold text-orange-500">Pending</span>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1">Catatan Admin / Alasan Penolakan (JTextArea):</label>
+          <textarea rows="2" placeholder="Isi jika aset ditolak (opsional jika disetujui)..." class="w-full px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)]"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button onclick="closeModal('modalAsset')" class="px-3 py-1.5 rounded-lg border border-[var(--border)]">Batal</button>
+          <button onclick="closeModal('modalAsset')" class="px-3 py-1.5 rounded-lg bg-red-500 text-white font-semibold">Tolak Aset</button>
+          <button onclick="closeModal('modalAsset')" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold">Setujui (Approve)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. POP-UP VERIFIKASI PENCAIRAN (Tanpa Upload Gambar Bukti Invoice) -->
+  <div id="modalPencairan" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+    <div class="w-full max-w-md bg-[var(--card)] border-2 border-[var(--border)] rounded-xl shadow-2xl overflow-hidden">
+      <div class="bg-[var(--sidebar)] px-4 py-2.5 border-b border-[var(--border)] flex items-center justify-between">
+        <span class="text-xs font-mono font-semibold">JDialog: Verifikasi Pencairan Dana</span>
+        <button onclick="closeModal('modalPencairan')" class="text-xs px-2 py-0.5 rounded hover:bg-red-500/20 text-red-500 font-bold">X</button>
+      </div>
+      <div class="p-5 space-y-3 text-xs">
+        <div class="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+          <strong>Tanpa Upload Bukti Gambar:</strong> Sesuai permintaan, form upload gambar invoice dihapus dan diganti input teks nomor referensi/catatan saja.
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 py-2 border-b border-[var(--border)]">
+          <span class="text-[var(--muted-foreground)]">ID Payout:</span>
+          <span class="col-span-2 font-mono">WD-501</span>
+          <span class="text-[var(--muted-foreground)]">Nama Kreator:</span>
+          <span class="col-span-2 font-bold">StudioNusa</span>
+          <span class="text-[var(--muted-foreground)]">Bank Tujuan:</span>
+          <span class="col-span-2">BCA - 8820192831 (a.n Dimas)</span>
+          <span class="text-[var(--muted-foreground)]">Nominal Transfer:</span>
+          <span class="col-span-2 font-bold text-sm text-orange-500">Rp 1.500.000</span>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1">No. Referensi Transfer / Catatan (JTextField):</label>
+          <input type="text" placeholder="Contoh: TRF-BCA-20261124001 /Alasan tolak" class="w-full px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)]" />
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button onclick="closeModal('modalPencairan')" class="px-3 py-1.5 rounded-lg border border-[var(--border)]">Tutup</button>
+          <button onclick="closeModal('modalPencairan')" class="px-3 py-1.5 rounded-lg bg-red-500 text-white font-semibold">Tolak</button>
+          <button onclick="closeModal('modalPencairan')" class="px-3.5 py-1.5 rounded-lg bg-orange-500 text-white font-semibold">Konfirmasi Selesai</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. POP-UP TAMBAH / EDIT KATEGORI -->
+  <div id="modalKategori" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+    <div class="w-full max-w-sm bg-[var(--card)] border-2 border-[var(--border)] rounded-xl shadow-2xl overflow-hidden">
+      <div class="bg-[var(--sidebar)] px-4 py-2.5 border-b border-[var(--border)] flex items-center justify-between">
+        <span class="text-xs font-mono font-semibold">JDialog: Form Kategori Aset</span>
+        <button onclick="closeModal('modalKategori')" class="text-xs px-2 py-0.5 rounded hover:bg-red-500/20 text-red-500 font-bold">X</button>
+      </div>
+      <div class="p-5 space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold mb-1">Nama Kategori (JTextField)</label>
+          <input type="text" value="3D Environment & Models" class="w-full px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)]" />
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Status (JComboBox)</label>
+          <select class="w-full px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)]">
+            <option>Aktif</option>
+            <option>Nonaktif</option>
+          </select>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button onclick="closeModal('modalKategori')" class="px-3 py-1.5 rounded-lg border border-[var(--border)]">Batal</button>
+          <button onclick="closeModal('modalKategori')" class="px-3.5 py-1.5 rounded-lg bg-orange-500 text-white font-semibold">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. POP-UP KONFIRMASI HAPUS (JOptionPane) -->
+  <div id="modalHapus" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+    <div class="w-full max-w-xs bg-[var(--card)] border-2 border-[var(--border)] rounded-xl shadow-2xl overflow-hidden">
+      <div class="bg-[var(--sidebar)] px-4 py-2 border-b border-[var(--border)]">
+        <span class="text-xs font-mono font-semibold">JOptionPane.showConfirmDialog</span>
+      </div>
+      <div class="p-5 text-center space-y-3 text-xs">
+        <div class="text-red-500 font-bold text-sm">Hapus Kategori Ini?</div>
+        <p class="text-[var(--muted-foreground)]">Data kategori yang dihapus tidak dapat dikembalikan.</p>
+        <div class="flex justify-center gap-2 pt-2">
+          <button onclick="closeModal('modalHapus')" class="px-3 py-1.5 rounded-lg border border-[var(--border)]">Batal</button>
+          <button onclick="closeModal('modalHapus')" class="px-3.5 py-1.5 rounded-lg bg-red-500 text-white font-semibold">Ya, Hapus</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. POP-UP UBAH STATUS PENGGUNA -->
+  <div id="modalUser" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+    <div class="w-full max-w-sm bg-[var(--card)] border-2 border-[var(--border)] rounded-xl shadow-2xl overflow-hidden">
+      <div class="bg-[var(--sidebar)] px-4 py-2.5 border-b border-[var(--border)] flex items-center justify-between">
+        <span class="text-xs font-mono font-semibold">JDialog: Kelola Akun Pengguna</span>
+        <button onclick="closeModal('modalUser')" class="text-xs px-2 py-0.5 rounded hover:bg-red-500/20 text-red-500 font-bold">X</button>
+      </div>
+      <div class="p-5 space-y-3 text-xs">
+        <div class="grid grid-cols-3 gap-1">
+          <span class="text-[var(--muted-foreground)]">Nama:</span>
+          <span class="col-span-2 font-bold">Dimas Prasetyo</span>
+          <span class="text-[var(--muted-foreground)]">Email:</span>
+          <span class="col-span-2">dimas@studionusa.id</span>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Role (JComboBox)</label>
+          <select class="w-full px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)]">
+            <option>Kreator</option>
+            <option>Pembeli (Buyer)</option>
+            <option>Admin</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Status Akun (JComboBox)</label>
+          <select class="w-full px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)]">
+            <option>Aktif</option>
+            <option>Suspended (Bekukan)</option>
+          </select>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button onclick="closeModal('modalUser')" class="px-3 py-1.5 rounded-lg border border-[var(--border)]">Batal</button>
+          <button onclick="closeModal('modalUser')" class="px-3.5 py-1.5 rounded-lg bg-orange-500 text-white font-semibold">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. POP-UP DETAIL TRANSAKSI -->
+  <div id="modalTransaksi" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+    <div class="w-full max-w-sm bg-[var(--card)] border-2 border-[var(--border)] rounded-xl shadow-2xl overflow-hidden">
+      <div class="bg-[var(--sidebar)] px-4 py-2.5 border-b border-[var(--border)] flex items-center justify-between">
+        <span class="text-xs font-mono font-semibold">JDialog: Detail Transaksi</span>
+        <button onclick="closeModal('modalTransaksi')" class="text-xs px-2 py-0.5 rounded hover:bg-red-500/20 text-red-500 font-bold">X</button>
+      </div>
+      <div class="p-5 space-y-2 text-xs">
+        <div class="grid grid-cols-2 gap-1.5 border-b border-[var(--border)] pb-3">
+          <span class="text-[var(--muted-foreground)]">ID Transaksi:</span>
+          <span class="font-mono font-bold">TRX-9081</span>
+          <span class="text-[var(--muted-foreground)]">Nama Aset:</span>
+          <span class="font-semibold">Indonesian Temple Ruins</span>
+          <span class="text-[var(--muted-foreground)]">Pembeli:</span>
+          <span>Kevin Pratama</span>
+          <span class="text-[var(--muted-foreground)]">Kreator:</span>
+          <span>GarudaMesh</span>
+          <span class="text-[var(--muted-foreground)]">Harga Aset:</span>
+          <span>Rp 300.000</span>
+          <span class="text-[var(--muted-foreground)]">Komisi Admin (10%):</span>
+          <span class="text-emerald-500 font-semibold">Rp 30.000</span>
+          <span class="text-[var(--muted-foreground)]">Diterima Kreator:</span>
+          <span class="font-bold">Rp 270.000</span>
+        </div>
+        <div class="pt-2 flex justify-end">
+          <button onclick="closeModal('modalTransaksi')" class="px-4 py-1.5 rounded-lg bg-orange-500 text-white font-semibold">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. POP-UP TINJAU LAPORAN -->
+  <div id="modalLaporan" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+    <div class="w-full max-w-md bg-[var(--card)] border-2 border-[var(--border)] rounded-xl shadow-2xl overflow-hidden">
+      <div class="bg-[var(--sidebar)] px-4 py-2.5 border-b border-[var(--border)] flex items-center justify-between">
+        <span class="text-xs font-mono font-semibold">JDialog: Detail Laporan / Pengajuan</span>
+        <button onclick="closeModal('modalLaporan')" class="text-xs px-2 py-0.5 rounded hover:bg-red-500/20 text-red-500 font-bold">X</button>
+      </div>
+      <div class="p-5 space-y-3 text-xs">
+        <div class="grid grid-cols-3 gap-1.5 border-b border-[var(--border)] pb-2">
+          <span class="text-[var(--muted-foreground)]">ID Tiket:</span>
+          <span class="col-span-2 font-mono">RPT-201</span>
+          <span class="text-[var(--muted-foreground)]">Pelapor:</span>
+          <span class="col-span-2 font-semibold">Andika (Buyer)</span>
+          <span class="text-[var(--muted-foreground)]">Keluhan:</span>
+          <span class="col-span-2">Arsip ZIP aset tidak bisa diekstrak pada bagian texture.</span>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Tanggapan / Solusi Admin (JTextArea):</label>
+          <textarea rows="2" placeholder="Tulis tindak lanjut..." class="w-full px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--background)]"></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-1">
+          <button onclick="closeModal('modalLaporan')" class="px-3 py-1.5 rounded-lg border border-[var(--border)]">Batal</button>
+          <button onclick="closeModal('modalLaporan')" class="px-3 py-1.5 rounded-lg bg-red-500 text-white font-semibold">Tolak Laporan</button>
+          <button onclick="closeModal('modalLaporan')" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold">Tandai Selesai</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. POP-UP LOGOUT -->
+  <div id="modalLogout" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+    <div class="w-full max-w-xs bg-[var(--card)] border-2 border-[var(--border)] rounded-xl shadow-2xl overflow-hidden">
+      <div class="bg-[var(--sidebar)] px-4 py-2 border-b border-[var(--border)]">
+        <span class="text-xs font-mono font-semibold">JOptionPane: Konfirmasi Keluar</span>
+      </div>
+      <div class="p-5 text-center space-y-3 text-xs">
+        <div class="font-bold text-sm">Keluar dari Akun Admin?</div>
+        <p class="text-[var(--muted-foreground)]">Anda akan kembali ke jendela LoginFrame.</p>
+        <div class="flex justify-center gap-2 pt-2">
+          <button onclick="closeModal('modalLogout')" class="px-3 py-1.5 rounded-lg border border-[var(--border)]">Batal</button>
+          <button onclick="closeModal('modalLogout'); switchFrame('login');" class="px-3.5 py-1.5 rounded-lg bg-orange-500 text-white font-semibold">Ya, Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchFrame(target) {
+      const fLogin = document.getElementById('frameLogin');
+      const fMain = document.getElementById('frameMain');
+      const bLogin = document.getElementById('btnViewLogin');
+      const bMain = document.getElementById('btnViewMain');
+      const title = document.getElementById('windowTitle');
+
+      if (target === 'login') {
+        fLogin.classList.remove('hidden');
+        fMain.classList.add('hidden');
+        bLogin.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-500 text-white shadow-sm transition';
+        bMain.className = 'px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] hover:border-orange-500 transition';
+        title.textContent = 'IndoFX Admin Desktop v1.0 — LoginFrame.java (JFrame)';
+      } else {
+        fLogin.classList.add('hidden');
+        fMain.classList.remove('hidden');
+        bMain.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-500 text-white shadow-sm transition';
+        bLogin.className = 'px-3 py-1.5 rounded-lg text-xs font-medium border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)] hover:border-orange-500 transition';
+        title.textContent = 'IndoFX Admin Desktop v1.0 — MainAdminFrame.java (CardLayout)';
+      }
+    }
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabId) {
+          btn.className = 'nav-btn w-full text-left px-3 py-2 rounded-lg text-xs font-semibold flex items-center justify-between bg-orange-500 text-white';
+        } else {
+          btn.className = 'nav-btn w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between text-[var(--foreground)] hover:bg-[var(--background)]';
+        }
+      });
+    }
+
+    function openModal(id) {
+      const m = document.getElementById(id);
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function openAssetModal(name, creator, cat, price, spec, status) {
+      document.getElementById('mAssetName').textContent = name;
+      document.getElementById('mAssetCreator').textContent = creator;
+      document.getElementById('mAssetCat').textContent = cat;
+      document.getElementById('mAssetPrice').textContent = price;
+      document.getElementById('mAssetSpec').textContent = spec;
+      document.getElementById('mAssetStatus').textContent = status;
+      openModal('modalAsset');
+    }
+  </script>
+</body>
+</html>
