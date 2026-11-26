@@ -4,19 +4,18 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 /**
- * Entry Point Utama Aplikasi Desktop IndoFX Admin.
- * Jalankan file ini di VS Code (klik tombol "Run" di atas method main).
+ * Entry Point Utama Aplikasi Desktop IndoFX Admin (NetBeans Java Ant).
+ * Tekan F6 di NetBeans untuk menjalankan FrmDashboard.
  */
 public class Main {
     public static void main(String[] args) {
-        // Gunakan Look and Feel Cross-Platform (Metal/Default) agar warna tombol konsisten di Windows/Mac/Linux
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (Exception ignored) {
         }
 
         SwingUtilities.invokeLater(() -> {
-            DashboardFrame frame = new DashboardFrame();
+            FrmDashboard frame = new FrmDashboard();
             frame.setVisible(true);
         });
     }
