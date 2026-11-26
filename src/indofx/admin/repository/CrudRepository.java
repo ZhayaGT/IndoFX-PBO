@@ -1,6 +1,6 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
 package indofx.admin.repository;
 
@@ -8,6 +8,7 @@ package indofx.admin.repository;
  *
  * @author ROG
  */
-public class CrudRepository {
-    
+public interface CrudRepository<T> extends ReadRepository<T> {
+    void save(T entity);
+    boolean delete(int id);
 }

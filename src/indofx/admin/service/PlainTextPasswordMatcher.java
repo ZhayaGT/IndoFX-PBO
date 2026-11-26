@@ -8,6 +8,9 @@ package indofx.admin.service;
  *
  * @author ROG
  */
-public class PlainTextPasswordMatcher {
-    
+public class PlainTextPasswordMatcher implements PasswordMatcher {
+    @Override
+    public boolean matches(String rawPassword, String storedPassword) {
+        return rawPassword != null && rawPassword.equals(storedPassword);
+    }  
 }
