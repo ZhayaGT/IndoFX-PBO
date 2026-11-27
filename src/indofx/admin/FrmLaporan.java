@@ -22,9 +22,46 @@ public class FrmLaporan extends javax.swing.JFrame {
      * Creates new form FrmDashboard
      */
     public FrmLaporan() {
-        initComponents();
-        loadDummyData();
+    initComponents();
+    loadDataLaporan("");
+}
+    private void loadDataLaporan(String keyword) {
+        if (keyword.equalsIgnoreCase("Cari ID tiket / subjek laporan")) {
+            keyword = "";
+        }
+    javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblAntrean.getModel();
+    model.setRowCount(0);
+
+    String sql = "SELECT sp.user_id, COALESCE(up.name, 'User') AS nama_pelapor, u.email, "
+               + "sp.store_name, COALESCE(sp.reason, '-') AS alasan, "
+               + "TO_CHAR(sp.created_at, 'DD Mon YYYY') AS tanggal, sp.status "
+               + "FROM public.seller_profiles sp "
+               + "JOIN public.users u ON sp.user_id = u.id "
+               + "LEFT JOIN public.user_profiles up ON u.id = up.user_id "
+               + "WHERE CAST(sp.user_id AS TEXT) ILIKE ? OR up.name ILIKE ? OR sp.store_name ILIKE ? "
+               + "ORDER BY sp.created_at DESC";
+
+    try (java.sql.Connection conn = KoneksiDB.getConnection();
+         java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+        String key = "%" + keyword + "%";
+        ps.setString(1, key);
+        ps.setString(2, key);
+        ps.setString(3, key);
+
+        java.sql.ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            model.addRow(new Object[]{
+                "RPT-" + rs.getLong("user_id"),
+                rs.getString("nama_pelapor") + " (" + rs.getString("email") + ")",
+                "Pengajuan Kreator: " + rs.getString("store_name") + " | " + rs.getString("alasan"),
+                rs.getString("tanggal"),
+                rs.getString("status").toUpperCase()
+            });
+        }
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Gagal memuat data laporan: " + e.getMessage());
     }
+}
 
     /**
      * Mengisi data contoh (dummy) ke JTable untuk tampilan Front-End.
@@ -264,7 +301,7 @@ public class FrmLaporan extends javax.swing.JFrame {
         jPanel1.setLayout(null);
 
         jTextField1.setBackground(new java.awt.Color(248, 250, 252));
-        jTextField1.setFont(new java.awt.Font("SansSerif", 0, 14)); // NOI18N
+        jTextField1.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
         jTextField1.setForeground(new java.awt.Color(100, 116, 139));
         jTextField1.setText("Cari ID tiket / subjek laporan");
         jTextField1.setActionCommand("<Not Set>");
@@ -272,6 +309,11 @@ public class FrmLaporan extends javax.swing.JFrame {
         jTextField1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(203, 213, 225)), javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 10)));
         jTextField1.setPreferredSize(new java.awt.Dimension(245, 36));
         jTextField1.addActionListener(this::jTextField1ActionPerformed);
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField1KeyReleased(evt);
+            }
+        });
         jPanel1.add(jTextField1);
         jTextField1.setBounds(16, 14, 290, 40);
 
@@ -279,6 +321,7 @@ public class FrmLaporan extends javax.swing.JFrame {
         jButton1.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Tinjau Laporan (Pop-up)");
+        jButton1.addActionListener(this::jButton1ActionPerformed);
         jPanel1.add(jButton1);
         jButton1.setBounds(550, 14, 182, 36);
 
@@ -402,7 +445,8 @@ public class FrmLaporan extends javax.swing.JFrame {
     }//GEN-LAST:event_btnMenu4ActionPerformed
 
     private void btnMenu5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMenu5ActionPerformed
-        showNavPlaceholder("5. Persetujuan & Laporan");
+       new FrmTransaksi().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnMenu5ActionPerformed
 
     private void btnMenu6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMenu6ActionPerformed
@@ -420,6 +464,30 @@ public class FrmLaporan extends javax.swing.JFrame {
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       int row = tblAntrean.getSelectedRow();
+if (row == -1) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Pilih salah satu baris pada tabel terlebih dahulu!");
+    return;
+}
+
+String idTiketStr = tblAntrean.getValueAt(row, 0).toString().replace("RPT-", "");
+long userId = Long.parseLong(idTiketStr);
+String pelaporFull = tblAntrean.getValueAt(row, 1).toString();
+String subjekFull = tblAntrean.getValueAt(row, 2).toString();
+String status = tblAntrean.getValueAt(row, 4).toString();
+
+DlgDetailLaporan dlg = new DlgDetailLaporan(this, true);
+dlg.setDataLaporan(userId, pelaporFull, subjekFull, status);
+dlg.setVisible(true);
+
+loadDataLaporan(jTextField1.getText().trim());
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+       loadDataLaporan(jTextField1.getText().trim());
+    }//GEN-LAST:event_jTextField1KeyReleased
 
     /**
      * @param args the command line arguments

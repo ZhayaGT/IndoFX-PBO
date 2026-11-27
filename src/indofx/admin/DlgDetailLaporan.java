@@ -21,17 +21,44 @@ public class DlgDetailLaporan extends javax.swing.JDialog {
     /**
      * Creates new form DlgQuickModerasi
      */
-    public DlgDetailLaporan(java.awt.Frame parent, boolean modal) {
+  public DlgDetailLaporan(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setTitle("Tindak Lanjut Laporan & Pengajuan");
+        setSize(540, 490);
+        setLocationRelativeTo(parent);
+    }
+private long userIdTarget = 0;
+
+    public void setDataLaporan(long userId, String namaPelapor, String subjek, String status) {
+        this.userIdTarget = userId;
+        lblInfoAset.setText("ID Tiket  :  RPT-" + userId + " (Status: " + status + ")");
+        lblInfoMeta.setText("Pelapor   :  " + namaPelapor);
+        lblInfoMeta2.setText("<html><body style='width: 360px'><b>Subjek :</b> " + subjek + "</body></html>");
+        lblInfoMeta3.setText("<html><body style='width: 360px'><b>Keluhan :</b> \"" + subjek + "\"</body></html>");
+        jTextArea1.setText("");
     }
 
-    /**
-     * Mengisi label informasi aset dari baris tabel yang dipilih.
-     */
-    public void setDataAset(String id, String nama, String kreator, String harga) {
-        lblInfoAset.setText("Moderasi Cepat: " + id + " (" + nama + ")");
-        lblInfoMeta.setText("Kreator: " + kreator + "  |  Harga: " + harga);
+    private void prosesKeputusanAdmin(String statusBaru) {
+        if (userIdTarget == 0) {
+            dispose();
+            return;
+        }
+        String catatan = jTextArea1.getText().trim();
+        String sql = "UPDATE public.seller_profiles SET status = ?, reject_reason = ?, reviewed_at = NOW() WHERE user_id = ?";
+
+        try (java.sql.Connection conn = KoneksiDB.getConnection();
+             java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, statusBaru);
+            ps.setString(2, catatan.isEmpty() ? null : catatan);
+            ps.setLong(3, userIdTarget);
+            ps.executeUpdate();
+
+            javax.swing.JOptionPane.showMessageDialog(this, "Status pengajuan berhasil diubah menjadi: " + statusBaru.toUpperCase());
+            dispose();
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Gagal menyimpan keputusan: " + e.getMessage());
+        }
     }
 
     /**
@@ -122,7 +149,7 @@ public class DlgDetailLaporan extends javax.swing.JDialog {
                     .addGroup(pnlDialogLayout.createSequentialGroup()
                         .addGroup(pnlDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDialogLayout.createSequentialGroup()
-                                .addGap(0, 98, Short.MAX_VALUE)
+                                .addGap(0, 71, Short.MAX_VALUE)
                                 .addComponent(btnBatal, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(8, 8, 8)
                                 .addComponent(btnTolak, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -135,7 +162,7 @@ public class DlgDetailLaporan extends javax.swing.JDialog {
                                     .addComponent(lblInfoMeta2)
                                     .addComponent(lblInfoMeta3)
                                     .addComponent(lblInfoAset1))
-                                .addGap(0, 34, Short.MAX_VALUE)))
+                                .addGap(0, 3, Short.MAX_VALUE)))
                         .addGap(20, 20, 20))))
         );
         pnlDialogLayout.setVerticalGroup(
@@ -158,7 +185,7 @@ public class DlgDetailLaporan extends javax.swing.JDialog {
                     .addComponent(btnBatal, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnTolak, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnSetujui, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         getContentPane().add(pnlDialog, java.awt.BorderLayout.CENTER);
@@ -168,17 +195,16 @@ public class DlgDetailLaporan extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBatalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBatalActionPerformed
-        hasilStatus = null;
         dispose();
     }//GEN-LAST:event_btnBatalActionPerformed
 
     private void btnTolakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTolakActionPerformed
-        hasilStatus = "DITOLAK";
+       prosesKeputusanAdmin("rejected");
         dispose();
     }//GEN-LAST:event_btnTolakActionPerformed
 
     private void btnSetujuiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSetujuiActionPerformed
-        hasilStatus = "DISETUJUI";
+        prosesKeputusanAdmin("approved");
         dispose();
     }//GEN-LAST:event_btnSetujuiActionPerformed
 

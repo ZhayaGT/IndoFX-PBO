@@ -21,24 +21,74 @@ public class FrmTransaksi extends javax.swing.JFrame {
     /**
      * Creates new form FrmDashboard
      */
-    public FrmTransaksi() {
+   public FrmTransaksi() {
         initComponents();
-        loadDummyData();
+        loadDataTransaksi("");
+        loadKpiTransaksi();
     }
 
-    /**
-     * Mengisi data contoh (dummy) ke JTable untuk tampilan Front-End.
-     * Nanti tinggal diganti dengan query database saat masuk tahap Back-End.
-     */
-    private void loadDummyData() {
-        DefaultTableModel model = (DefaultTableModel) tblAntrean.getModel();
+    private void loadDataTransaksi(String keyword) {
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblAntrean.getModel();
+        if (keyword.equalsIgnoreCase("Cari ID transaksi / nama pembeli")) {
+         keyword = "";
+     }
         model.setRowCount(0);
-        model.addRow(new Object[]{"AST-101", "Cyberpunk City 3D Pack", "StudioNusa", "3D Environment", "Rp 250.000", "PENDING"});
-        model.addRow(new Object[]{"AST-102", "Cinematic Fire VFX Vol.2", "RakaVFX", "Footage / VFX", "Rp 120.000", "PENDING"});
-        model.addRow(new Object[]{"AST-103", "Sci-Fi Laser Sound Pack", "AudioWave", "Audio & SFX", "Rp 75.000", "PENDING"});
-        model.addRow(new Object[]{"AST-100", "Indonesian Temple Ruins", "GarudaMesh", "3D Environment", "Rp 300.000", "DISETUJUI"});
-        if (tblAntrean.getRowCount() > 0) {
-            tblAntrean.setRowSelectionInterval(0, 0);
+
+        String sql = "SELECT t.invoice_number, COALESCE(up.name, 'Buyer') || ' (' || u.email || ')' AS pembeli, "
+                   + "COALESCE(a.title, '-') AS nama_aset, t.amount, UPPER(t.status) AS status "
+                   + "FROM public.transactions t "
+                   + "JOIN public.users u ON t.buyer_id = u.id "
+                   + "LEFT JOIN public.user_profiles up ON u.id = up.user_id "
+                   + "LEFT JOIN public.transaction_details td ON t.id = td.transaction_id "
+                   + "LEFT JOIN public.assets a ON td.asset_id = a.id "
+                   + "WHERE t.invoice_number ILIKE ? OR up.name ILIKE ? OR a.title ILIKE ? "
+                   + "ORDER BY t.created_at DESC";
+
+        try (java.sql.Connection conn = KoneksiDB.getConnection();
+             java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+            String key = "%" + keyword + "%";
+            ps.setString(1, key);
+            ps.setString(2, key);
+            ps.setString(3, key);
+
+            java.sql.ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getString("invoice_number"),
+                    rs.getString("pembeli"),
+                    rs.getString("nama_aset"),
+                    "Rp " + String.format("%,d", rs.getInt("amount")).replace(',', '.'),
+                    rs.getString("status")
+                });
+            }
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Gagal memuat data transaksi: " + e.getMessage());
+        }
+    }
+
+    private void loadKpiTransaksi() {
+        String sql = "SELECT "
+                   + "COALESCE(SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END), 0) AS total_gmv, "
+                   + "COUNT(CASE WHEN status = 'paid' THEN 1 END) AS trx_berhasil, "
+                   + "COUNT(CASE WHEN status IN ('failed', 'refunded', 'expire') THEN 1 END) AS trx_gagal "
+                   + "FROM public.transactions";
+
+        try (java.sql.Connection conn = KoneksiDB.getConnection();
+             java.sql.PreparedStatement ps = conn.prepareStatement(sql);
+             java.sql.ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                long gmv = rs.getLong("total_gmv");
+                long komisi = Math.round(gmv * 0.10);
+                int berhasil = rs.getInt("trx_berhasil");
+                int gagal = rs.getInt("trx_gagal");
+
+                lblValGmv.setText("Rp " + String.format("%,d", gmv).replace(',', '.'));
+                lblValKomisi.setText("Rp " + String.format("%,d", komisi).replace(',', '.'));
+                lblValBerhasil.setText(berhasil + " Trx");
+                lblValGagal.setText(gagal + " Trx");
+            }
+        } catch (Exception e) {
+            System.err.println("Gagal memuat KPI transaksi: " + e.getMessage());
         }
     }
 
@@ -82,16 +132,16 @@ public class FrmTransaksi extends javax.swing.JFrame {
         pnlStats = new javax.swing.JPanel();
         cardTotalAset = new javax.swing.JPanel();
         lblStat1Title = new javax.swing.JLabel();
-        lblStat1Val = new javax.swing.JLabel();
+        lblValGmv = new javax.swing.JLabel();
         cardPending = new javax.swing.JPanel();
         lblStat2Title = new javax.swing.JLabel();
-        lblStat2Val = new javax.swing.JLabel();
+        lblValKomisi = new javax.swing.JLabel();
         cardPengguna = new javax.swing.JPanel();
         lblStat3Title = new javax.swing.JLabel();
-        lblStat3Val = new javax.swing.JLabel();
+        lblValBerhasil = new javax.swing.JLabel();
         cardKomisi = new javax.swing.JPanel();
         lblStat4Title = new javax.swing.JLabel();
-        lblStat4Val = new javax.swing.JLabel();
+        lblValGagal = new javax.swing.JLabel();
         pnlTableCard = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblAntrean = new javax.swing.JTable();
@@ -288,9 +338,9 @@ public class FrmTransaksi extends javax.swing.JFrame {
         lblStat1Title.setForeground(new java.awt.Color(100, 116, 139));
         lblStat1Title.setText("Total Transaksi (GMV)");
 
-        lblStat1Val.setFont(new java.awt.Font("SansSerif", 1, 20)); // NOI18N
-        lblStat1Val.setForeground(new java.awt.Color(15, 23, 42));
-        lblStat1Val.setText("Rp 145.0 Jt");
+        lblValGmv.setFont(new java.awt.Font("SansSerif", 1, 20)); // NOI18N
+        lblValGmv.setForeground(new java.awt.Color(15, 23, 42));
+        lblValGmv.setText("Rp 145.0 Jt");
 
         javax.swing.GroupLayout cardTotalAsetLayout = new javax.swing.GroupLayout(cardTotalAset);
         cardTotalAset.setLayout(cardTotalAsetLayout);
@@ -299,7 +349,7 @@ public class FrmTransaksi extends javax.swing.JFrame {
             .addGroup(cardTotalAsetLayout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addGroup(cardTotalAsetLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblStat1Val)
+                    .addComponent(lblValGmv)
                     .addComponent(lblStat1Title, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
@@ -309,7 +359,7 @@ public class FrmTransaksi extends javax.swing.JFrame {
                 .addGap(14, 14, 14)
                 .addComponent(lblStat1Title)
                 .addGap(8, 8, 8)
-                .addComponent(lblStat1Val)
+                .addComponent(lblValGmv)
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
@@ -322,9 +372,9 @@ public class FrmTransaksi extends javax.swing.JFrame {
         lblStat2Title.setForeground(new java.awt.Color(22, 163, 74));
         lblStat2Title.setText("Komisi Platform (10%)");
 
-        lblStat2Val.setFont(new java.awt.Font("SansSerif", 1, 20)); // NOI18N
-        lblStat2Val.setForeground(new java.awt.Color(22, 163, 74));
-        lblStat2Val.setText("Rp 14.5 Jt");
+        lblValKomisi.setFont(new java.awt.Font("SansSerif", 1, 20)); // NOI18N
+        lblValKomisi.setForeground(new java.awt.Color(22, 163, 74));
+        lblValKomisi.setText("Rp 14.5 Jt");
 
         javax.swing.GroupLayout cardPendingLayout = new javax.swing.GroupLayout(cardPending);
         cardPending.setLayout(cardPendingLayout);
@@ -335,7 +385,7 @@ public class FrmTransaksi extends javax.swing.JFrame {
                 .addGroup(cardPendingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblStat2Title, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
                     .addGroup(cardPendingLayout.createSequentialGroup()
-                        .addComponent(lblStat2Val, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblValKomisi, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -345,7 +395,7 @@ public class FrmTransaksi extends javax.swing.JFrame {
                 .addGap(14, 14, 14)
                 .addComponent(lblStat2Title)
                 .addGap(8, 8, 8)
-                .addComponent(lblStat2Val)
+                .addComponent(lblValKomisi)
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
@@ -358,9 +408,9 @@ public class FrmTransaksi extends javax.swing.JFrame {
         lblStat3Title.setForeground(new java.awt.Color(100, 116, 139));
         lblStat3Title.setText("Transaksi Berhasil");
 
-        lblStat3Val.setFont(new java.awt.Font("SansSerif", 1, 20)); // NOI18N
-        lblStat3Val.setForeground(new java.awt.Color(15, 23, 42));
-        lblStat3Val.setText("612 Trx");
+        lblValBerhasil.setFont(new java.awt.Font("SansSerif", 1, 20)); // NOI18N
+        lblValBerhasil.setForeground(new java.awt.Color(15, 23, 42));
+        lblValBerhasil.setText("612 Trx");
 
         javax.swing.GroupLayout cardPenggunaLayout = new javax.swing.GroupLayout(cardPengguna);
         cardPengguna.setLayout(cardPenggunaLayout);
@@ -371,7 +421,7 @@ public class FrmTransaksi extends javax.swing.JFrame {
                 .addGroup(cardPenggunaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblStat3Title, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(cardPenggunaLayout.createSequentialGroup()
-                        .addComponent(lblStat3Val, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblValBerhasil, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 35, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -381,7 +431,7 @@ public class FrmTransaksi extends javax.swing.JFrame {
                 .addGap(14, 14, 14)
                 .addComponent(lblStat3Title)
                 .addGap(8, 8, 8)
-                .addComponent(lblStat3Val)
+                .addComponent(lblValBerhasil)
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
@@ -394,9 +444,9 @@ public class FrmTransaksi extends javax.swing.JFrame {
         lblStat4Title.setForeground(new java.awt.Color(100, 116, 139));
         lblStat4Title.setText("Gagal / Refund");
 
-        lblStat4Val.setFont(new java.awt.Font("SansSerif", 1, 20)); // NOI18N
-        lblStat4Val.setForeground(new java.awt.Color(220, 38, 38));
-        lblStat4Val.setText("4 Trx");
+        lblValGagal.setFont(new java.awt.Font("SansSerif", 1, 20)); // NOI18N
+        lblValGagal.setForeground(new java.awt.Color(220, 38, 38));
+        lblValGagal.setText("4 Trx");
 
         javax.swing.GroupLayout cardKomisiLayout = new javax.swing.GroupLayout(cardKomisi);
         cardKomisi.setLayout(cardKomisiLayout);
@@ -406,7 +456,7 @@ public class FrmTransaksi extends javax.swing.JFrame {
                 .addGap(14, 14, 14)
                 .addGroup(cardKomisiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblStat4Title)
-                    .addComponent(lblStat4Val))
+                    .addComponent(lblValGagal))
                 .addContainerGap(83, Short.MAX_VALUE))
         );
         cardKomisiLayout.setVerticalGroup(
@@ -415,7 +465,7 @@ public class FrmTransaksi extends javax.swing.JFrame {
                 .addGap(14, 14, 14)
                 .addComponent(lblStat4Title)
                 .addGap(8, 8, 8)
-                .addComponent(lblStat4Val)
+                .addComponent(lblValGagal)
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
@@ -477,9 +527,10 @@ public class FrmTransaksi extends javax.swing.JFrame {
         jButton1.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Lihat Detail (Pop up)");
+        jButton1.addActionListener(this::jButton1ActionPerformed);
 
         jTextField1.setBackground(new java.awt.Color(248, 250, 252));
-        jTextField1.setFont(new java.awt.Font("SansSerif", 0, 14)); // NOI18N
+        jTextField1.setFont(new java.awt.Font("SansSerif", 0, 12)); // NOI18N
         jTextField1.setForeground(new java.awt.Color(100, 116, 139));
         jTextField1.setText("Cari ID transaksi / nama pembeli");
         jTextField1.setActionCommand("<Not Set>");
@@ -487,6 +538,11 @@ public class FrmTransaksi extends javax.swing.JFrame {
         jTextField1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(203, 213, 225)), javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 10)));
         jTextField1.setPreferredSize(new java.awt.Dimension(245, 36));
         jTextField1.addActionListener(this::jTextField1ActionPerformed);
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField1KeyReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -519,7 +575,7 @@ public class FrmTransaksi extends javax.swing.JFrame {
                     .addComponent(lblTitle)
                     .addComponent(lblSubtitle)
                     .addComponent(pnlStats, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 756, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 772, Short.MAX_VALUE)
                     .addComponent(pnlTableCard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
@@ -571,7 +627,8 @@ public class FrmTransaksi extends javax.swing.JFrame {
     }//GEN-LAST:event_btnMenu4ActionPerformed
 
     private void btnMenu5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMenu5ActionPerformed
-        showNavPlaceholder("5. Persetujuan & Laporan");
+        new FrmLaporan().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnMenu5ActionPerformed
 
     private void btnMenu6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMenu6ActionPerformed
@@ -589,6 +646,53 @@ public class FrmTransaksi extends javax.swing.JFrame {
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        int row = tblAntrean.getSelectedRow();
+if (row == -1) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Pilih salah satu baris transaksi terlebih dahulu!");
+    return;
+}
+
+String invoice = tblAntrean.getValueAt(row, 0).toString();
+String sql = "SELECT t.invoice_number, UPPER(t.status) AS status, "
+           + "TO_CHAR(COALESCE(t.paid_at, t.created_at), 'DD Mon YYYY, HH24:MI') || ' WIB' AS tanggal, "
+           + "COALESCE(a.title, '-') AS nama_aset, "
+           + "COALESCE(up.name, 'Buyer') || ' (' || u.email || ')' AS pembeli, "
+           + "COALESCE(sp.store_name, '-') AS kreator, t.amount "
+           + "FROM public.transactions t "
+           + "JOIN public.users u ON t.buyer_id = u.id "
+           + "LEFT JOIN public.user_profiles up ON u.id = up.user_id "
+           + "LEFT JOIN public.transaction_details td ON t.id = td.transaction_id "
+           + "LEFT JOIN public.assets a ON td.asset_id = a.id "
+           + "LEFT JOIN public.seller_profiles sp ON a.seller_id = sp.user_id "
+           + "WHERE t.invoice_number = ?";
+
+try (java.sql.Connection conn = KoneksiDB.getConnection();
+     java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+    ps.setString(1, invoice);
+    java.sql.ResultSet rs = ps.executeQuery();
+    if (rs.next()) {
+        DlgDetailTransaksi dlg = new DlgDetailTransaksi(this, true);
+        dlg.setDataTransaksi(
+            rs.getString("invoice_number"),
+            rs.getString("status"),
+            rs.getString("tanggal"),
+            rs.getString("nama_aset"),
+            rs.getString("pembeli"),
+            rs.getString("kreator"),
+            rs.getInt("amount")
+        );
+        dlg.setVisible(true);
+    }
+} catch (Exception e) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Gagal memuat detail transaksi: " + e.getMessage());
+}
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+        loadDataTransaksi(jTextField1.getText().trim());
+    }//GEN-LAST:event_jTextField1KeyReleased
 
     /**
      * @param args the command line arguments
@@ -626,16 +730,16 @@ public class FrmTransaksi extends javax.swing.JFrame {
     private javax.swing.JLabel lblLogo;
     private javax.swing.JLabel lblMenuTitle;
     private javax.swing.JLabel lblStat1Title;
-    private javax.swing.JLabel lblStat1Val;
     private javax.swing.JLabel lblStat2Title;
-    private javax.swing.JLabel lblStat2Val;
     private javax.swing.JLabel lblStat3Title;
-    private javax.swing.JLabel lblStat3Val;
     private javax.swing.JLabel lblStat4Title;
-    private javax.swing.JLabel lblStat4Val;
     private javax.swing.JLabel lblSubLogo;
     private javax.swing.JLabel lblSubtitle;
     private javax.swing.JLabel lblTitle;
+    private javax.swing.JLabel lblValBerhasil;
+    private javax.swing.JLabel lblValGagal;
+    private javax.swing.JLabel lblValGmv;
+    private javax.swing.JLabel lblValKomisi;
     private javax.swing.JPanel pnlContent;
     private javax.swing.JPanel pnlHeader;
     private javax.swing.JPanel pnlSidebar;
