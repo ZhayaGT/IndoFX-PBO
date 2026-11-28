@@ -571,7 +571,8 @@ public class FrmDashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_btnTinjauActionPerformed
 
     private void btnMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMenu2ActionPerformed
-        showNavPlaceholder("2. Moderasi Aset");
+        new FrmModerasiAset().setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnMenu2ActionPerformed
 
     private void btnMenu3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMenu3ActionPerformed
