@@ -23,6 +23,11 @@ public class FrmDashboard extends javax.swing.JFrame {
      */
     public FrmDashboard() {
         initComponents();
+        btnLogout.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        if (btnLogout instanceof RoundedButton rbHeaderLogout) {
+            rbHeaderLogout.setHoverBackground(new java.awt.Color(255, 247, 237));
+            rbHeaderLogout.setHoverBorder(new java.awt.Color(154, 52, 18), 2); // Border oranye gelap 2px
+        }
         loadDummyData();
     }
 
@@ -65,7 +70,7 @@ public class FrmDashboard extends javax.swing.JFrame {
         lblLogo = new javax.swing.JLabel();
         lblSubLogo = new javax.swing.JLabel();
         lblAdmin = new javax.swing.JLabel();
-        btnLogout = new javax.swing.JButton();
+        btnLogout = new RoundedButton(8);
         pnlSidebar = new javax.swing.JPanel();
         lblMenuTitle = new javax.swing.JLabel();
         btnMenu1 = new javax.swing.JButton();
@@ -101,7 +106,6 @@ public class FrmDashboard extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("IndoFX Admin — Ringkasan Dashboard (1024 x 680)");
-        setPreferredSize(new java.awt.Dimension(1024, 680));
         setResizable(false);
 
         pnlHeader.setBackground(new java.awt.Color(249, 115, 22));
@@ -119,7 +123,6 @@ public class FrmDashboard extends javax.swing.JFrame {
         lblAdmin.setForeground(new java.awt.Color(255, 255, 255));
         lblAdmin.setText("Admin: Andi Pratama");
 
-        btnLogout.setBackground(new java.awt.Color(255, 255, 255));
         btnLogout.setFont(new java.awt.Font("SansSerif", 1, 12)); // NOI18N
         btnLogout.setForeground(new java.awt.Color(234, 88, 12));
         btnLogout.setText("Logout");
@@ -531,15 +534,11 @@ public class FrmDashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-        int jawab = JOptionPane.showConfirmDialog(
-                this,
-                "Keluar dari Akun Admin?\nSesi Anda akan ditutup dan kembali ke LoginFrame.",
-                "Konfirmasi Logout",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-        if (jawab == JOptionPane.YES_OPTION) {
-            JOptionPane.showMessageDialog(this, "Berhasil Logout! (Nanti hubungkan ke FrmLogin).");
+        DlgLogout dialog = new DlgLogout(this, true);
+        dialog.setVisible(true);
+        if (dialog.isConfirmed()) {
+            new FrmLogin().setVisible(true);
+            this.dispose();
         }
     }//GEN-LAST:event_btnLogoutActionPerformed
 
